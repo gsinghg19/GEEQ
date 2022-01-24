@@ -1,13 +1,12 @@
 import { StatusBar } from "expo-status-bar";
-
 import React from "react";
 import { StyleSheet } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { useEffect, useState } from "react";
 import { db, auth } from "./firebase";
 import { Text, View } from "react-native";
+import MapScreen from "./screens/MapScreen";
 
+import { NavigationContainer } from "@react-navigation/native";
 import {
   addDoc,
   collection,
@@ -24,11 +23,10 @@ import {
 import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
 import FirebaseTesting from "./Components/FirebaseTesting";
-import Chat from "./components/Chat";
-import SingleGroupPage from "./components/SingleGroupPage";
+import Chat from "./Components/Chat";
+import SingleGroupPage from "./Components/SingleGroupPage";
 
 const Stack = createNativeStackNavigator();
-
 
 export default function App() {
   return (
@@ -43,16 +41,8 @@ export default function App() {
         <Stack.Screen name="FirebaseTesting" component={FirebaseTesting} />
         <Stack.Screen name="Chat" component={Chat} />
         <Stack.Screen name="Group" component={SingleGroupPage} />
+        <Stack.Screen name="Map" component={MapScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
