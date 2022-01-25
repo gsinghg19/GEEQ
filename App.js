@@ -53,7 +53,7 @@ export default function App() {
           });
         }
       })();
-    }, 60000);
+    }, 30000);
   }, []);
 
   return (
