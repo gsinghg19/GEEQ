@@ -1,24 +1,53 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Text, TextInput, View, Image, StyleSheet, Button } from "react-native";
 import { auth } from "../firebase";
 import { updateEmail, updateProfile } from "firebase/auth";
+import * as Location from "expo-location";
 //To be careful when contacting database, user object occurs twice, once in authentication (can this be updated?) and once in Firestore database
 
 const UserAccount = () => {
+  const [location, setLocation] = useState(null);
+
+  const [errorMsg, setErrorMsg] = useState(null);
   const [user, setUser] = useState({
     email: auth.currentUser.email,
     name: auth.currentUser.displayName,
     phoneNumber: auth.currentUser.phoneNumber,
     avatar: auth.currentUser.photoURL,
     transport: "car", //would have to get transport method from database here
+    coords: { lat: 0, long: 0 },
   });
-  const [email, setEmail] = useState(user.email);
-  const [name, setName] = useState(user.name);
-  const [avatar, setAvatar] = useState(user.avatar);
-  const [transport, setTransport] = useState(user.transport);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Location permissions not granted");
+      }
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+      if (location) {
+        setUser((prevUser) => {
+          return {
+            ...prevUser,
+            coords: {
+              lat: location.coords.latitude,
+              lng: location.coords.longitude,
+            },
+          };
+        });
+      }
+    })();
+  }, []);
 
   return (
     <View style={styles.container}>
+      <Text>My last known position:</Text>
+      <Text>
+        {errorMsg
+          ? errorMsg
+          : `latitude ${location.coords.latitude} : longitude ${location.coords.longitude}`}
+      </Text>
       <Text style={styles.heading}>Email</Text>
       <TextInput
         value={user.email}

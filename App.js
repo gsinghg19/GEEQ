@@ -36,7 +36,6 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="Map" component={MapScreen} />
         <Stack.Screen
           options={{ headerShown: false }}
           name="Login"
@@ -49,6 +48,7 @@ export default function App() {
 
         <Stack.Screen name="Chat" component={Chat} />
         <Stack.Screen name="Group" component={SingleGroupPage} />
+        <Stack.Screen name="Map" component={MapScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
