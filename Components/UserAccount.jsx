@@ -15,7 +15,7 @@ const UserAccount = () => {
     phoneNumber: auth.currentUser.phoneNumber,
     avatar: auth.currentUser.photoURL,
     transport: "car", //would have to get transport method from database here
-    coords: { lat: 0, long: 0 },
+    coords: { lat: 0, lng: 0 },
   });
 
   useEffect(() => {
@@ -46,7 +46,7 @@ const UserAccount = () => {
       <Text>
         {errorMsg
           ? errorMsg
-          : `latitude ${location.coords.latitude} : longitude ${location.coords.longitude}`}
+          : `latitude ${user.coords.lat} : longitude ${user.coords.lng}`}
       </Text>
       <Text style={styles.heading}>Email</Text>
       <TextInput

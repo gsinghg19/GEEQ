@@ -21,18 +21,41 @@ import {
   where,
   orderBy,
   serverTimestamp,
+  updateDoc,
 } from "firebase/firestore";
 import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
 import FirebaseTesting from "./Components/FirebaseTesting";
 import Chat from "./Components/Chat";
 import SingleGroupPage from "./Components/SingleGroupPage";
-
+import * as Location from "expo-location";
 import UserAccount from "./Components/UserAccount";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  useEffect(() => {
+    const autoLocationUpdate = setInterval(() => {
+      (async () => {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          setErrorMsg("Location permissions not granted");
+        }
+        let location = await Location.getCurrentPositionAsync({});
+
+        if (location) {
+          const userDetails = doc(db, "users", auth.currentUser.uid);
+          await updateDoc(userDetails, {
+            coords: {
+              lat: location.coords.latitude,
+              lng: location.coords.longitude,
+            },
+          });
+        }
+      })();
+    }, 60000);
+  }, []);
+
   return (
     <NavigationContainer>
       <Stack.Navigator>
