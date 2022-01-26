@@ -35,25 +35,24 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   useEffect(() => {
-    const autoLocationUpdate = setInterval(() => {
-      (async () => {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          setErrorMsg("Location permissions not granted");
-        }
-        let location = await Location.getCurrentPositionAsync({});
-
-        if (location) {
-          const userDetails = doc(db, "users", auth.currentUser.uid);
-          await updateDoc(userDetails, {
-            coords: {
-              lat: location.coords.latitude,
-              lng: location.coords.longitude,
-            },
-          });
-        }
-      })();
-    }, 30000);
+    // const autoLocationUpdate = setInterval(() => {
+    //   (async () => {
+    //     let { status } = await Location.requestForegroundPermissionsAsync();
+    //     if (status !== "granted") {
+    //       setErrorMsg("Location permissions not granted");
+    //     }
+    //     let location = await Location.getCurrentPositionAsync({});
+    //     if (location) {
+    //       const userDetails = doc(db, "users", auth.currentUser.uid);
+    //       await updateDoc(userDetails, {
+    //         coords: {
+    //           lat: location.coords.latitude,
+    //           lng: location.coords.longitude,
+    //         },
+    //       });
+    //     }
+    //   })();
+    // }, 30000);
   }, []);
 
   return (
