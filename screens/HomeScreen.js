@@ -3,7 +3,6 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View, Button } from "react-native";
 import CreateGroup from "../Components/CreateGroup";
 import { auth } from "../firebase";
-// import NavBar from "../Components/NavBar";
 import Nav from "../Components/Nav";
 import ViewGroups from "../Components/ViewGroups";
 
@@ -34,8 +33,9 @@ const HomeScreen = () => {
         }}
       />
 
-      <CreateGroup />
-      <ViewGroups />
+      {/* <CreateGroup /> */}
+      {/* <ViewGroups /> */}
+      <Nav />
     </View>
   );
 };

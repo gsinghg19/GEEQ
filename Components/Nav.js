@@ -1,21 +1,20 @@
 import React, { useState } from "react";
-import { ButtonGroup } from "react-native-elements";
+import { ButtonGroup, Button } from "react-native-elements";
 import { Text, StyleSheet } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
+import MapScreen from "../screens/MapScreen";
 
 export default () => {
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const navigation = useNavigation();
 
   return (
-    <>
-      <ButtonGroup
-        buttons={["Home", "Groups", "Map", "UserAccount"]}
-        selectedIndex={selectedIndex}
-        onPress={(value) => {
-          setSelectedIndex(value);
-        }}
-        containerStyle={{ marginBottom: 20 }}
-      />
-    </>
+    <Button
+      title="Map"
+      onPress={() => {
+        navigation.navigate("Root", { screen: "MapScreen" });
+      }}
+    />
   );
 };
 
