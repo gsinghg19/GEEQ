@@ -1,5 +1,5 @@
 import { useNavigation, useNavigationParam } from '@react-navigation/native';
-import { StatusBar } from 'expo-status-bar';
+
 import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
 import {
   collection,

@@ -1,0 +1,109 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Cannot render without login first 1`] = `
+Array [
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "#fff",
+        "flex": 1,
+        "justifyContent": "center",
+      }
+    }
+  >
+    <Text>
+      Create a new group
+    </Text>
+    <View
+      style={
+        Object {
+          "padding": 10,
+        }
+      }
+    >
+      <TextInput
+        allowFontScaling={true}
+        defaultValue=""
+        onChangeText={[Function]}
+        placeholder="Group name!"
+        rejectResponderTermination={true}
+        style={
+          Object {
+            "height": 40,
+          }
+        }
+        underlineColorAndroid="transparent"
+      />
+      <TextInput
+        allowFontScaling={true}
+        defaultValue=""
+        onChangeText={[Function]}
+        placeholder="Avatar url"
+        rejectResponderTermination={true}
+        style={
+          Object {
+            "height": 40,
+          }
+        }
+        underlineColorAndroid="transparent"
+      />
+      <View
+        accessibilityRole="button"
+        accessibilityState={Object {}}
+        accessible={true}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "opacity": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Array [
+              Object {},
+            ]
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#007AFF",
+                  "fontSize": 18,
+                  "margin": 8,
+                  "textAlign": "center",
+                },
+              ]
+            }
+          >
+            Submit
+          </Text>
+        </View>
+      </View>
+    </View>
+  </View>,
+  <Text
+    accessibilityRole="link"
+    href="/ViewGroups"
+    onPress={[Function]}
+  >
+    View all groups
+  </Text>,
+  <Text
+    accessibilityRole="link"
+    href="/Group?group_id=4cXw12VSrQoKHmKsL1Di"
+    onPress={[Function]}
+  >
+    Go to a group
+  </Text>,
+]
+`;

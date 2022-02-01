@@ -14,11 +14,11 @@ import { auth, db } from '../firebase';
 import { useState, useEffect } from 'react';
 import GlobalCSS from '../GlobalCSS';
 
-export default function CreateGroup({ navigation }) {
+export default function CreateGroupTest({ navigation }) {
   //const navigation = useNavigation();
   const collRef = collection(db, 'groups');
   const [user, setUser] = useState({});
-  const uid = auth.currentUser.uid; //ef83N7qN5beB5oJtm9CgCnW7Ydv1
+  const uid = '01eA1h0NaPb9ErZQg1O61o6V4rq2'; // auth.currentUser.uid;
   console.log('auth ', uid);
 
   const docRef = doc(db, 'users', uid);
