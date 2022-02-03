@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/core";
-
+import * as Location from "expo-location";
 import React, { useEffect, useState, useContext } from "react";
 import {
   KeyboardAvoidingView,
