@@ -1,5 +1,6 @@
 import { useNavigation } from "@react-navigation/core";
-import React, { useEffect, useState } from "react";
+
+import React, { useEffect, useState, useContext } from "react";
 import {
   KeyboardAvoidingView,
   StyleSheet,
@@ -7,19 +8,37 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Image,
+  ImageBackground,
 } from "react-native";
 import { auth, db } from "../firebase";
 import { doc, setDoc } from "firebase/firestore";
+import { updateProfile } from "firebase/auth";
+import { ThemeContext, UserContext } from "../Context/Context";
+
 const LoginScreen = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [bio, setName] = useState("");
+  const theme = useContext(ThemeContext);
+  const { setIsSignedIn } = useContext(UserContext);
+
+  const [email, setEmail] = useState("1@example.com");
+  const [password, setPassword] = useState("password");
+  const [userName, setUserName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+
   const [loginPressed, setLoginPressed] = useState(false);
   const [registerPressed, setRegisterPressed] = useState(false);
+  const [coords, setCoords] = useState({ lat: 0, lng: 0 });
+  const [avatar, setAvatar] = useState("https://picsum.photos/200");
 
   const navigation = useNavigation();
 
   useEffect(() => {
+    fetch("https://api.3geonames.org/?randomland=UK&json=1")
+      .then((res) => res.json())
+      .then((res) =>
+        setCoords({ lat: res.nearest.latt, lng: res.nearest.longt })
+      );
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         navigation.replace("Home");
@@ -29,30 +48,45 @@ const LoginScreen = () => {
     return unsubscribe;
   }, []);
 
+  const randColourHex = () => {
+    let num = Math.floor(Math.random() * 255);
+    let hex = parseInt(num).toString(16);
+    return hex.length === 1 ? `0${hex}` : hex;
+  };
   const handleSignUp = () => {
-    auth
-      .createUserWithEmailAndPassword(email, password)
-      .then((userCredentials) => {
-        const user = userCredentials.user;
-        //can we make this add display name?
-        //would have to access auth object - perhaps go to next screen to set further user details
-        return setDoc(doc(db, "users", user.uid), {
-          email: user.email,
-        });
-      })
-      .then((user) => {
-        console.log(user);
-        alert("Registered with:", user.email);
-      })
-      .catch((error) => alert(error.message));
+    if (!firstName || !lastName) {
+      alert("All fields must be complete for user registration.");
+    } else {
+      auth
+        .createUserWithEmailAndPassword(email, password)
+        .then((userCredentials) => {
+          setIsSignedIn(true);
+          const user = userCredentials.user;
+          alert(`Registered with: ${user.email}`);
+          updateProfile(auth.currentUser, {
+            displayName: `${firstName} ${lastName}`,
+            photoURL: avatar,
+          });
+          return setDoc(doc(db, "users", user.uid), {
+            email: user.email,
+            avatar,
+            name: `${firstName} ${lastName}`,
+            transport: "car",
+            coords,
+            colour: `#${randColourHex()}${randColourHex()}${randColourHex()}`,
+          });
+        })
+        .catch((error) => alert(error.message));
+    }
   };
 
   const handleLogin = () => {
     auth
       .signInWithEmailAndPassword(email, password)
       .then((userCredentials) => {
+        setIsSignedIn(true);
         const user = userCredentials.user;
-        console.log("Logged in with:", user.email);
+        console.log(`Logged in with: ${user.email}`);
       })
       .catch(function () {
         return alert("Incorrect email and/or password. try again");
@@ -68,137 +102,126 @@ const LoginScreen = () => {
       .catch((error) => alert("Please enter Email."));
   };
 
-  return (
-    <KeyboardAvoidingView style={styles.container} behavior="padding">
-      {loginPressed ? (
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholder="Email"
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-            style={styles.loginInput}
-          />
-          <TextInput
-            placeholder="Password"
-            value={password}
-            onChangeText={(text) => setPassword(text)}
-            style={styles.loginInput}
-            secureTextEntry
-          />
-          <TouchableOpacity onPress={handleLogin} style={styles.button}>
-            <Text style={styles.buttonText}>Login</Text>
-          </TouchableOpacity>
-        </View>
-      ) : registerPressed ? (
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholder="Email"
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-            style={styles.loginInput}
-          />
-          <TextInput
-            placeholder="Password"
-            value={password}
-            onChangeText={(text) => setPassword(text)}
-            style={styles.loginInput}
-            secureTextEntry
-          />
-          <TextInput
-            placeholder="User Name"
-            value={bio}
-            onChangeText={(text) => setName(text)}
-            style={styles.loginInput}
-            secureTextEntry
-          />
-          <TouchableOpacity onPress={handleSignUp} style={styles.button}>
-            <Text style={styles.buttonText}>Sign Up</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            onPress={() => {
-              setLoginPressed(true);
-            }}
-            style={styles.button}
-          >
-            <Text style={styles.buttonText}>Login</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setRegisterPressed(true);
-            }}
-            style={[styles.button, styles.buttonOutline]}
-          >
-            {/* additional fields here but need to find out how to add them to user object, i.e. watch tutorial */}
-            <Text style={styles.buttonOutlineText}>Register</Text>
-          </TouchableOpacity>
+  const back = () => {
+    auth
+      .signOut()
+      .then(() => {
+        navigation.replace("Login");
+      })
+      .catch((error) => alert(error.message));
+  };
+  const LoginFields = (
+    <View style={theme.inputContainer}>
+      <TextInput
+        placeholder="Email"
+        value={email}
+        defaultValue="1@example.com"
+        onChangeText={(text) => setEmail(text)}
+        style={theme.loginInput}
+      />
+      <TextInput
+        placeholder="Password"
+        value={password}
+        defaultValue="password"
+        onChangeText={(text) => setPassword(text)}
+        style={theme.loginInput}
+        secureTextEntry
+      />
+      <TouchableOpacity
+        onPress={handleLogin}
+        style={[theme.button, theme.buttonOutline]}
+      >
+        <Text style={theme.buttonText}>Login</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={back} style={theme.button}>
+        <Text style={theme.buttonText}>back</Text>
+      </TouchableOpacity>
+      <View style={theme.buttonContainerReset}>
+        <TouchableOpacity onPress={resetPassword} style={theme.button}>
+          <Text style={theme.buttonText}>Forgotten Password?</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 
-          <View style={styles.buttonContainerReset}>
-            {/* maybe make this button only on the login option */}
-            <TouchableOpacity onPress={resetPassword} style={styles.button}>
-              <Text style={styles.buttonText}>Forgotten Password?</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
-    </KeyboardAvoidingView>
+  const RegisterFields = (
+    <View style={theme.inputContainer}>
+      <TextInput
+        placeholder="Email"
+        value={email}
+        onChangeText={(text) => setEmail(text)}
+        style={theme.loginInput}
+      />
+      <TextInput
+        placeholder="Password"
+        value={password}
+        onChangeText={(text) => setPassword(text)}
+        style={theme.loginInput}
+        secureTextEntry
+      />
+      <TextInput
+        placeholder="First Name"
+        value={firstName}
+        onChangeText={(text) => setFirstName(text)}
+        style={theme.loginInput}
+        secureTextEntry
+      />
+      <TextInput
+        placeholder="Last Name"
+        value={lastName}
+        onChangeText={(text) => setLastName(text)}
+        style={theme.loginInput}
+        secureTextEntry
+      />
+      <TouchableOpacity onPress={handleSignUp} style={theme.button}>
+        <Text style={theme.buttonText}>Sign Up</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={back} style={theme.button}>
+        <Text style={theme.buttonText}>back</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  return (
+    <>
+      <ImageBackground
+        source={require("../assets/bdropweak.png")}
+        resizeMode="cover"
+        style={{ height: "100%", justifyContent: "center" }}
+      >
+        <KeyboardAvoidingView
+          style={[theme.container, { height: "60%" }]}
+          behavior="padding"
+        >
+          <Image source={require("../assets/gmlogo.png")} style={theme.logo} />
+          {loginPressed ? (
+            LoginFields
+          ) : registerPressed ? (
+            RegisterFields
+          ) : (
+            <View style={theme.buttonContainer}>
+              <TouchableOpacity
+                onPress={() => {
+                  setLoginPressed(true);
+                }}
+                style={[theme.button, theme.buttonOutline]}
+              >
+                <Text style={theme.buttonText}>Login</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setRegisterPressed(true);
+                }}
+                style={[theme.button, theme.buttonOutline]}
+              >
+                <Text style={theme.buttonText}>Register</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </KeyboardAvoidingView>
+      </ImageBackground>
+    </>
   );
 };
 
 export default LoginScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "lightblue",
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  inputContainer: {
-    width: "70%",
-  },
-  loginInput: {
-    backgroundColor: "white",
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 10,
-    marginTop: 5,
-  },
-  buttonContainer: {
-    width: "50%",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 40,
-  },
-  buttonContainerReset: {
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 100,
-  },
-  button: {
-    backgroundColor: "#0782F9",
-    width: "100%",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  buttonOutline: {
-    backgroundColor: "white",
-    marginTop: 5,
-    borderColor: "#0782F9",
-    borderWidth: 2,
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "700",
-    fontSize: 16,
-  },
-  buttonOutlineText: {
-    color: "#0782F9",
-    fontWeight: "700",
-    fontSize: 16,
-  },
-});

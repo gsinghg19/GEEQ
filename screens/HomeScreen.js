@@ -1,63 +1,56 @@
-import { StyleSheet, Text, TouchableOpacity, View, Button } from "react-native";
 import { useNavigation } from "@react-navigation/core";
-import React from "react";
-import CreateGroup from "../Components/CreateGroup";
+import React, { useContext, useEffect } from "react";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Button,
+  ScrollView,
+  ImageBackground,
+} from "react-native";
 import { auth } from "../firebase";
+// import NavBar from "../Components/NavBar";
+import InviteTest from "../Components/InviteTest";
+import { ThemeContext, UserContext } from "../Context/Context";
+import UserMenu2 from "../Components/UserMenu2";
+import ViewMyGroups from "../Components/ViewMyGroups";
+import Nav from "../Components/Nav";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
+  const theme = useContext(ThemeContext);
+  const { user, setUser, groups, setGroups } = useContext(UserContext);
 
-  const handleSignOut = () => {
-    auth
-      .signOut()
-      .then(() => {
-        navigation.replace("Login");
-      })
-      .catch((error) => alert(error.message));
-  };
+  useEffect(() => {
+    console.log("homepage render", groups);
+  }, [groups]);
 
   return (
-    <View style={styles.container}>
-      <Text>Email: {auth.currentUser?.email}</Text>
-      <Text>HomePage of groups and invites will go here</Text>
-      <TouchableOpacity onPress={handleSignOut} style={styles.button}>
-        <Text style={styles.buttonText}>
-          Sign out = need to discuss how to sign out from page. not in wireframe
-        </Text>
-      </TouchableOpacity>
-
-      <Button
-        title="My Account"
-        onPress={() => {
-          navigation.navigate("UserAccount");
-        }}
-      />
-
-      <CreateGroup />
-    </View>
+    <>
+      <ImageBackground
+        source={require("../assets/bdropweak.png")}
+        resizeMode="cover"
+        style={{ height: "100%", justifyContent: "center" }}
+      >
+        <View style={theme.homeContainer2}>
+          <View style={{ width: "90%" }}>
+            <Text style={theme.header}>Welcome {user.name}</Text>
+          </View>
+          <View>
+            <Text style={[theme.header2, { fontWeight: "bold" }]}>Invites</Text>
+            <InviteTest />
+            <Text style={[theme.header2, { fontWeight: "bold" }]}>
+              My Groups
+            </Text>
+            <ViewMyGroups />
+          </View>
+          <Nav type={"home"} />
+          <UserMenu2 />
+        </View>
+      </ImageBackground>
+    </>
   );
 };
 
 export default HomeScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "lightblue",
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  button: {
-    backgroundColor: "#0782F9",
-    width: "60%",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 40,
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "700",
-    fontSize: 16,
-  },
-});
