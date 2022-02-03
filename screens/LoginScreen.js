@@ -26,7 +26,7 @@ const LoginScreen = () => {
   const [userName, setUserName] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-
+  const [location, setLocation] = useState();
   const [loginPressed, setLoginPressed] = useState(false);
   const [registerPressed, setRegisterPressed] = useState(false);
   const [coords, setCoords] = useState({ lat: 0, lng: 0 });
