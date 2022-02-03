@@ -13,7 +13,7 @@ import {
   Alert,
 } from "react-native";
 import { auth, db } from "../firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { updateProfile } from "firebase/auth";
 import { ThemeContext, UserContext } from "../Context/Context";
 
@@ -31,6 +31,7 @@ const LoginScreen = () => {
   const [registerPressed, setRegisterPressed] = useState(false);
   const [coords, setCoords] = useState({ lat: 0, lng: 0 });
   const [avatar, setAvatar] = useState("https://picsum.photos/200");
+  const [loadingCoords, setLoadingCoords] = useState(false);
 
   const navigation = useNavigation();
 
@@ -82,13 +83,31 @@ const LoginScreen = () => {
     }
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     auth
       .signInWithEmailAndPassword(email, password)
       .then((userCredentials) => {
         setIsSignedIn(true);
         const user = userCredentials.user;
         console.log(`Logged in with: ${user.email}`);
+      })
+      .then(async () => {
+        setLoadingCoords(true);
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          alert("Location permissions not granted");
+        }
+        let location = await Location.getCurrentPositionAsync({});
+        if (location) {
+          const docref = doc(db, "users", auth.currentUser.uid);
+          await updateDoc(docref, {
+            coords: {
+              lat: location.coords.latitude,
+              lng: location.coords.longitude,
+            },
+          });
+        }
+        setLoadingCoords(false);
       })
       .catch(function () {
         return alert("Incorrect email and/or password. try again");
@@ -191,36 +210,43 @@ const LoginScreen = () => {
         resizeMode="cover"
         style={{ height: "100%", justifyContent: "center" }}
       >
-        <KeyboardAvoidingView
-          style={[theme.container, { height: "60%" }]}
-          behavior="padding"
-        >
-          <Image source={require("../assets/gmlogo.png")} style={theme.logo} />
-          {loginPressed ? (
-            LoginFields
-          ) : registerPressed ? (
-            RegisterFields
-          ) : (
-            <View style={theme.buttonContainer}>
-              <TouchableOpacity
-                onPress={() => {
-                  setLoginPressed(true);
-                }}
-                style={[theme.button, theme.buttonOutline]}
-              >
-                <Text style={theme.buttonText}>Login</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  setRegisterPressed(true);
-                }}
-                style={[theme.button, theme.buttonOutline]}
-              >
-                <Text style={theme.buttonText}>Register</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </KeyboardAvoidingView>
+        {!loadingCoords ? (
+          <KeyboardAvoidingView
+            style={[theme.container, { height: "60%" }]}
+            behavior="padding"
+          >
+            <Image
+              source={require("../assets/gmlogo.png")}
+              style={theme.logo}
+            />
+            {loginPressed ? (
+              LoginFields
+            ) : registerPressed ? (
+              RegisterFields
+            ) : (
+              <View style={theme.buttonContainer}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setLoginPressed(true);
+                  }}
+                  style={[theme.button, theme.buttonOutline]}
+                >
+                  <Text style={theme.buttonText}>Login</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    setRegisterPressed(true);
+                  }}
+                  style={[theme.button, theme.buttonOutline]}
+                >
+                  <Text style={theme.buttonText}>Register</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </KeyboardAvoidingView>
+        ) : (
+          <Text>LOADING...</Text>
+        )}
       </ImageBackground>
     </>
   );

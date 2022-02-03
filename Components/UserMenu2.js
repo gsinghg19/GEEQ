@@ -1,10 +1,24 @@
 import { StyleSheet, Text, View } from "react-native";
 import React, { useState, useContext } from "react";
+import * as Location from "expo-location";
+
 import { Menu, MenuItem, MenuDivider } from "react-native-material-menu";
 import { Icon, SpeedDial, FAB } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
 import { ThemeContext } from "../Context/Context";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  query,
+  updateDoc,
+  arrayUnion,
+  orderBy,
+  startAt,
+  endAt,
+} from "firebase/firestore";
 
 export default function UserMenu2({}) {
   const theme = useContext(ThemeContext);
@@ -16,7 +30,22 @@ export default function UserMenu2({}) {
     navigation.navigate("Home", { user_id: auth.currentUser.uid });
   };
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      alert("Location permissions not granted");
+    }
+    let location = await Location.getCurrentPositionAsync({});
+    if (location) {
+      const docref = doc(db, "users", auth.currentUser.uid);
+      await updateDoc(docref, {
+        coords: {
+          lat: location.coords.latitude,
+          lng: location.coords.longitude,
+        },
+      });
+    }
+
     auth
       .signOut()
       .then(() => {
