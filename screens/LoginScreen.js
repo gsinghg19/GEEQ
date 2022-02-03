@@ -59,18 +59,6 @@ const LoginScreen = () => {
     if (!firstName || !lastName) {
       alert("All fields must be complete for user registration.");
     } else {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        alert("Location permissions not granted");
-      }
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-      if (location) {
-        setCoords({
-          lat: location.coords.latitude,
-          lng: location.coords.longitude,
-        });
-      }
       auth
         .createUserWithEmailAndPassword(email, password)
         .then((userCredentials) => {
