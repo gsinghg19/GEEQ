@@ -10,6 +10,7 @@ import {
   View,
   Image,
   ImageBackground,
+  Alert,
 } from "react-native";
 import { auth, db } from "../firebase";
 import { doc, setDoc } from "firebase/firestore";
@@ -33,25 +34,12 @@ const LoginScreen = () => {
 
   const navigation = useNavigation();
 
-  useEffect(async () => {
+  useEffect(() => {
     // fetch("https://api.3geonames.org/?randomland=UK&json=1")
     //   .then((res) => res.json())
     //   .then((res) =>
     //     setCoords({ lat: res.nearest.latt, lng: res.nearest.longt })
     //   );
-
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      setErrorMsg("Location permissions not granted");
-    }
-    let location = await Location.getCurrentPositionAsync({});
-    setLocation(location);
-    if (location) {
-      setCoords({
-        lat: location.coords.latitude,
-        lng: location.coords.longitude,
-      });
-    }
 
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
@@ -67,10 +55,22 @@ const LoginScreen = () => {
     let hex = parseInt(num).toString(16);
     return hex.length === 1 ? `0${hex}` : hex;
   };
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     if (!firstName || !lastName) {
       alert("All fields must be complete for user registration.");
     } else {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        alert("Location permissions not granted");
+      }
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+      if (location) {
+        setCoords({
+          lat: location.coords.latitude,
+          lng: location.coords.longitude,
+        });
+      }
       auth
         .createUserWithEmailAndPassword(email, password)
         .then((userCredentials) => {
