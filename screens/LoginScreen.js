@@ -33,12 +33,26 @@ const LoginScreen = () => {
 
   const navigation = useNavigation();
 
-  useEffect(() => {
-    fetch("https://api.3geonames.org/?randomland=UK&json=1")
-      .then((res) => res.json())
-      .then((res) =>
-        setCoords({ lat: res.nearest.latt, lng: res.nearest.longt })
-      );
+  useEffect(async () => {
+    // fetch("https://api.3geonames.org/?randomland=UK&json=1")
+    //   .then((res) => res.json())
+    //   .then((res) =>
+    //     setCoords({ lat: res.nearest.latt, lng: res.nearest.longt })
+    //   );
+
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      setErrorMsg("Location permissions not granted");
+    }
+    let location = await Location.getCurrentPositionAsync({});
+    setLocation(location);
+    if (location) {
+      setCoords({
+        lat: location.coords.latitude,
+        lng: location.coords.longitude,
+      });
+    }
+
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         navigation.replace("Home");
