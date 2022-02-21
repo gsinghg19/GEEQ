@@ -2,7 +2,7 @@
 
 <img width="586" alt="Screenshot 2022-02-21 at 00 14 17" src="https://user-images.githubusercontent.com/91670399/154870872-f0c8dda4-620b-4a97-b92f-3f2d1044dce5.png">
 
-https://user-images.githubusercontent.com/91670399/154871123-fa652ab6-2462-4d7d-8198-d772c02193df.mp4
+- [**See a demo of the app**](https://user-images.githubusercontent.com/91670399/154871123-fa652ab6-2462-4d7d-8198-d772c02193df.mp4)
 
 
 
@@ -45,3 +45,12 @@ Move into repository directory and run npm install to install all the dependenci
 To run the app in the development mode, run expo start in the terminal.
 
 You would need to install iOS and and Android emulators to test the app. You can also install Expo Go client on your physical mobile to test the app.
+
+## Future development ideas
+
+- [ ] Real time updating of user location
+- [ ] Random place option
+- [ ] Fully implement transport type
+- [ ] Explore possibility of meeting point weighting based on user transport type
+- [ ] Eventual completion and upload to the App Store
+- [ ] Fix google map/Android bugs.
